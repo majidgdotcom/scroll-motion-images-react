@@ -1,46 +1,72 @@
-# Getting Started with Create React App
+# Shake Image with Scroll Project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project implements a ShakeImageWithScroll component that dynamically displays images while scrolling through the page. It supports various customizations such as image size, distance between images, fullscreen options, and responsiveness. The project also includes a Home component that renders multiple ShakeImageWithScroll instances with different configurations.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Dynamic Image Loading:** Images are loaded and displayed as the user scrolls.
+- **Responsive Layout:** The layout is responsive, adjusting based on the window size.
+- **ustomization:** Props allow for controlling image folder, number of images, scroll distance, and image size.
+- **Full-Screen Support:** Option to display images in full-screen mode.
 
-### `npm start`
+## Project Structure
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- **Home.tsx:** Renders the ShakeImageWithScroll components with different configurations.
+- **ShakeImageWithScroll.tsx:** The main component responsible for rendering images based on the user’s scroll position.
+- **IShakeImageWithScroll.ts:** Interface definition for the props passed to ShakeImageWithScroll.
+- **home.css:** Custom styles for the components, including background colors, scrollbars, and responsive design.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Installation
 
-### `npm test`
+1.	Clone the repository:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2.	Navigate to the project directory:
 
-### `npm run build`
+	```
+	cd shakeImageWithScroll
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3.	Install the dependencies:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+	```
+	npm install
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+4.	Start the development server:
 
-### `npm run eject`
+	```
+	npm start
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+5.	Open http://localhost:3000 to view it in the browser.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Usage
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+1.	**Folder Structure for Images:** Place your images in the public folder, organized in subfolders. For example:
 
-## Learn More
+        public/
+        ├── majidTemplate/
+        │   ├── 0.jpg
+        │   ├── 1.jpg
+        │   └── ...
+        └── mickyTemplate/
+            ├── 0.jpg
+            ├── 1.jpg
+            └── ...
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2.	**Home Component:** The Home component demonstrates how to use the ShakeImageWithScroll component. It renders two sets of images with different configurations:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+3.	**ShakeImageWithScroll Component:** This component displays images based on scroll position and provides customization options like fullscreen, width size, and distance between images.
+
+## Props for ShakeImageWithScroll
+
+| **Prop Name**  | **Type**               | **Description**                                                    |
+|----------------|------------------------|--------------------------------------------------------------------|
+| `id`           | `string`               | Unique identifier for the image set.                               |
+| `folder`       | `string`               | Folder name where images are stored.                               |
+| `length`       | `number`               | Total number of images in the folder.                              |
+| `distance`     | `number`               | Distance between images in pixels.                                 |
+| `fileFormat`   | `string`               | File format for the images (e.g., `.jpg`, `.png`).                 |
+| `backColor`    | `string` (optional)    | Background color for the component.                                |
+| `fullScreen`   | `boolean` (optional)   | Whether to display images in fullscreen mode.                      |
+| `widthSize`    | `object` (optional)    | Object specifying image width before and after 768px.              |
+| `scrollY`      | `number`               | Current scroll position, passed from the parent.                   |
+| `windowSize`   | `object`               | Current window size (width and height), passed from the parent.    |

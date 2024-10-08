@@ -1,0 +1,21 @@
+:root {
+    --backColor: #dde3e1;
+    --backColorHover: #c4d0ce;
+}
+
+.sectionColor:nth-child(odd) {
+    background-color: var(--backColorHover);
+}
+
+.sectionColor {
+    background-color: var(--backColor);
+}
+
+*::-webkit-scrollbar {
+    visibility: hidden;
+  }
+
+* {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
