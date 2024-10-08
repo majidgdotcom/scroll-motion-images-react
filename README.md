@@ -1,6 +1,6 @@
-# Shake Image with Scroll Project
+# Motion images with scroll - Project
 
-This project implements a ShakeImageWithScroll component that dynamically displays images while scrolling through the page. It supports various customizations such as image size, distance between images, fullscreen options, and responsiveness. The project also includes a Home component that renders multiple ShakeImageWithScroll instances with different configurations.
+This project implements a MotionImagesWithScroll component that dynamically displays images while scrolling through the page. It supports various customizations such as image size, distance between images, fullscreen options, and responsiveness. The project also includes a Home component that renders multiple MotionImagesWithScroll instances with different configurations.
 
 ## Features
 
@@ -11,9 +11,9 @@ This project implements a ShakeImageWithScroll component that dynamically displa
 
 ## Project Structure
 
-- **Home.tsx:** Renders the ShakeImageWithScroll components with different configurations.
-- **ShakeImageWithScroll.tsx:** The main component responsible for rendering images based on the user’s scroll position.
-- **IShakeImageWithScroll.ts:** Interface definition for the props passed to ShakeImageWithScroll.
+- **Home.tsx:** Renders the MotionImagesWithScroll components with different configurations.
+- **MotionImagesWithScroll.tsx:** The main component responsible for rendering images based on the user’s scroll position.
+- **IMotionImagesWithScroll.ts:** Interface definition for the props passed to MotionImagesWithScroll.
 - **home.css:** Custom styles for the components, including background colors, scrollbars, and responsive design.
 
 ## Installation
@@ -23,7 +23,7 @@ This project implements a ShakeImageWithScroll component that dynamically displa
 2.	Navigate to the project directory:
 
 	```
-	cd shakeImageWithScroll
+	cd scroll-motion-images-react
 
 3.	Install the dependencies:
 
@@ -52,11 +52,11 @@ This project implements a ShakeImageWithScroll component that dynamically displa
             ├── 1.jpg
             └── ...
 
-2.	**Home Component:** The Home component demonstrates how to use the ShakeImageWithScroll component. It renders two sets of images with different configurations:
+2.	**Home Component:** The Home component demonstrates how to use the MotionImagesWithScroll component. It renders two sets of images with different configurations:
 
-3.	**ShakeImageWithScroll Component:** This component displays images based on scroll position and provides customization options like fullscreen, width size, and distance between images.
+3.	**MotionImagesWithScroll Component:** This component displays images based on scroll position and provides customization options like fullscreen, width size, and distance between images.
 
-## Props for ShakeImageWithScroll
+## Props for MotionImagesWithScroll
 
 | **Prop Name**  | **Type**               | **Description**                                                    |
 |----------------|------------------------|--------------------------------------------------------------------|

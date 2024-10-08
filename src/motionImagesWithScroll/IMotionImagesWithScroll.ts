@@ -1,4 +1,4 @@
-export interface ShakeImageWithScrollProps {
+export interface MotionImagesWithScrollProps {
     id: string;
     folder: string;
     length: number;

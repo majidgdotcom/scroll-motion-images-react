@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import ShakeImageWithScroll from '../shakeImageWithScroll/ShakeImageWithScroll';
+import MotionImagesWithScroll from '../motionImagesWithScroll/MotionImagesWithScroll';
 import './home.css';
 
 const Home: React.FC = () => {
@@ -27,7 +27,7 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <ShakeImageWithScroll
+      <MotionImagesWithScroll
         id='majidTemplate'
         folder='majidTemplate'
         length={51}
@@ -37,7 +37,7 @@ const Home: React.FC = () => {
         scrollY={scrollY}
         windowSize={windowSize}
       />
-      <ShakeImageWithScroll
+      <MotionImagesWithScroll
         id='mickyTemplate'
         folder='mickyTemplate'
         length={128}

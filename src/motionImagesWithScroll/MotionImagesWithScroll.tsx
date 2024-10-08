@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ShakeImageWithScrollProps } from './IShakeImageWithScroll';
+import { MotionImagesWithScrollProps } from './IMotionImagesWithScroll';
 
-const ShakeImageWithScroll: React.FC<ShakeImageWithScrollProps> = (props) => {
+const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = (props) => {
 
   const [imgsLoaded, setImgsLoaded] = useState<boolean>(false);
   const [imageIndex, setImageIndex] = useState<number>(0);
@@ -99,7 +99,7 @@ const ShakeImageWithScroll: React.FC<ShakeImageWithScrollProps> = (props) => {
 
   return (
     <div
-      className='ShakeImageWithScrollContainer sectionColor'
+      className='MotionImagesWithScrollContainer sectionColor'
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -111,7 +111,7 @@ const ShakeImageWithScroll: React.FC<ShakeImageWithScrollProps> = (props) => {
       id={setId()}
     >
       <div
-        className='ShakeImageWithScrollHeader'
+        className='MotionImagesWithScrollHeader'
         style={{
           position: containerJustifyContent === 'flex-end' ? 'relative' : 'absolute',
           zIndex: 2,
@@ -122,7 +122,7 @@ const ShakeImageWithScroll: React.FC<ShakeImageWithScrollProps> = (props) => {
         {!imgsLoaded ? (<h2>Loading...</h2>) : null}
       </div>
       <div
-        className='ShakeImageWithScrollItem'
+        className='MotionImagesWithScrollItem'
         style={{
           top: 0,
           width: '100vw',
@@ -141,4 +141,4 @@ const ShakeImageWithScroll: React.FC<ShakeImageWithScrollProps> = (props) => {
   );
 };
 
-export default ShakeImageWithScroll;
+export default MotionImagesWithScroll;
