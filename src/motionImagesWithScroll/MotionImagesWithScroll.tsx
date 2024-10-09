@@ -57,7 +57,7 @@ const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = (props) =>
             height: props.fullScreen ? '100vh' : 'auto',
             objectFit: 'cover',
           }}
-          src={process.env.PUBLIC_URL + `${props.folder}/${i}${props.fileFormat}`}
+          src={process.env.PUBLIC_URL + `/${props.folder}/${i}${props.fileFormat}`}
           alt={`Image ${i}`}
         />
       );
@@ -70,7 +70,7 @@ const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = (props) =>
     if (!imgsLoaded) {
       const IMAGES = [];
       for (let i = 0; i < props.length; i++) {
-        IMAGES.push({ url: process.env.PUBLIC_URL + `${props.folder}/${i}${props.fileFormat}` });
+        IMAGES.push({ url: process.env.PUBLIC_URL + `/${props.folder}/${i}${props.fileFormat}` });
       }
       Promise.all(IMAGES.map((image) => loadImage(image)))
         .then(() => setImgsLoaded(true))
