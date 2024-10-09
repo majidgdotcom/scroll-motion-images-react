@@ -2,6 +2,12 @@
 
 This project implements a MotionImagesWithScroll component that dynamically displays images while scrolling through the page. It supports various customizations such as image size, distance between images, fullscreen options, and responsiveness. The project also includes a Home component that renders multiple MotionImagesWithScroll instances with different configurations.
 
+## Releases
+
+You can view the live demo of the project at the following link:
+
+[Live Demo](https://majidgdotcom.github.io/scroll-motion-images-react/)
+
 ## Features
 
 - **Dynamic Image Loading:** Images are loaded and displayed as the user scrolls.
