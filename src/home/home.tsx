@@ -64,7 +64,7 @@ const Home: React.FC = () => {
         length={128}
         distance={25}
         fileFormat=".jpg"
-        widthSize={{ after768: '350px', befor768: '300px' }}
+        widthSize={{ after768: '350px', before768: '300px' }}
         scrollY={scrollY}
         windowSize={windowSize}
       />

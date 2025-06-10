@@ -3,15 +3,18 @@ import { useEffect, useState, useMemo } from 'react';
 export interface ScrollMotionImageSequenceProps {
   id: string;
   folder: string;
-  length: number;
-  distance: number;
-  fileFormat: string;
+  length: number; // total number of frames/images
+  distance: number; // pixels to scroll per frame change
+  fileFormat: string; // e.g. '.jpg', '.png'
+
   backColor?: string;
   fullScreen?: boolean;
+
   widthSize?: {
-    befor768: string;
-    after768: string;
+    before768: string;  // screen width below 768px
+    after768: string;   // screen width above 768px
   };
+
   scrollY: number;
   windowSize: {
     width: number;
@@ -138,7 +141,7 @@ const ScrollMotionImageSequence: React.FC<ScrollMotionImageSequenceProps> = ({
                 ? '100vw'
                 : windowSize.width > 768
                 ? widthSize?.after768 ?? '100vw'
-                : widthSize?.befor768 ?? '80vw',
+                : widthSize?.before768 ?? '80vw',
               height: fullScreen ? '100vh' : 'auto',
               objectFit: 'cover',
             }}
