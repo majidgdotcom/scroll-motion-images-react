@@ -1,5 +1,32 @@
 import { useEffect, useState } from 'react';
-import { MotionImagesWithScrollProps } from './IMotionImagesWithScroll';
+
+export interface MotionImagesWithScrollProps {
+  id: string;
+  folder: string;
+  length: number;
+  distance: number;
+  fileFormat: string;
+  backColor?: string;
+  fullScreen?: boolean;
+  widthSize?: {
+    befor768: string;
+    after768: string
+  };
+  scrollY: number;
+  windowSize: {
+    width: number;
+    height: number
+  };
+}
+
+export const loadImage = (image: { url: string }): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const loadImg = new Image();
+    loadImg.src = image.url;
+    loadImg.onload = () => setTimeout(() => resolve(image.url), 2000);
+    loadImg.onerror = (err) => reject(err);
+  });
+};
 
 const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = (props) => {
 
@@ -35,16 +62,7 @@ const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = (props) =>
     return r < 0 ? 0 : r;
   };
 
-  const loadImage = (image: { url: string }): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const loadImg = new Image();
-      loadImg.src = image.url;
-      loadImg.onload = () => setTimeout(() => resolve(image.url), 2000);
-      loadImg.onerror = (err) => reject(err);
-    });
-  };
-
-  const images = (): JSX.Element => {
+  const images = () => {
     const menuItems = [];
 
     for (let i = 0; i < props.length; i++) {
@@ -53,12 +71,16 @@ const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = (props) =>
           key={i}
           style={{
             display: imageIndex !== i ? 'none' : 'inline-block',
-            width: props.fullScreen ? '100vw' : (props.windowSize.width > 768 ? (props.widthSize?.after768 ?? '100vw') : (props.widthSize?.befor768 ?? '80vw')),
+            width: props.fullScreen
+              ? '100vw'
+              : (props.windowSize.width > 768
+                ? (props.widthSize?.after768 ?? '100vw')
+                : (props.widthSize?.befor768 ?? '80vw')),
             height: props.fullScreen ? '100vh' : 'auto',
             objectFit: 'cover',
           }}
           src={process.env.PUBLIC_URL + `/${props.folder}/${i}${props.fileFormat}`}
-          alt={`Image ${i}`}
+          alt={`Frame ${i}`}
         />
       );
     }
@@ -76,7 +98,7 @@ const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = (props) =>
         .then(() => setImgsLoaded(true))
         .catch((err) => console.error('Failed to load images', err));
     }
-  }, []);
+  }, [imgsLoaded]);
 
   useEffect(() => {
     const start = startItem();
@@ -99,14 +121,13 @@ const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = (props) =>
 
   return (
     <div
-      className='MotionImagesWithScrollContainer sectionColor'
+      className='MotionImagesWithScrollContainer'
       style={{
         display: 'flex',
         flexDirection: 'column',
         justifyContent: containerJustifyContent,
         height: itemScrollHeight(),
         minHeight: itemScrollHeight(),
-        backgroundColor: props.backColor,
       }}
       id={setId()}
     >
@@ -119,7 +140,7 @@ const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = (props) =>
           marginTop: '50px',
         }}
       >
-        {!imgsLoaded ? (<h2>Loading...</h2>) : null}
+          {!imgsLoaded ? (<h2>Loading...</h2>) : null}
       </div>
       <div
         className='MotionImagesWithScrollItem'
