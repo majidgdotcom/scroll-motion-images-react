@@ -1,52 +1,74 @@
 import { useEffect, useState } from 'react';
 import MotionImagesWithScroll from '../motionImagesWithScroll/MotionImagesWithScroll';
 import './home.css';
+import throttle from 'lodash.throttle';
 
-const Home: React.FC = () => {
-  const [scrollY, setScrollY] = useState<number>(window.scrollY);
-  const [windowSize, setWindowSize] = useState<{ width: number; height: number }>({
+// Custom hook for window size
+const useWindowSize = () => {
+  const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    const handleResize = () => setWindowSize({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
+    const handleResize = throttle(() => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    }, 100);
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return windowSize;
+};
+
+// Custom hook for scroll position
+const useScrollY = () => {
+  const [scrollY, setScrollY] = useState(window.scrollY);
+
+  useEffect(() => {
+    const handleScroll = throttle(() => {
+      setScrollY(window.scrollY);
+    }, 100);
 
     window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleResize);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  return scrollY;
+};
+
+const Home: React.FC = () => {
+  const scrollY = useScrollY();
+  const windowSize = useWindowSize();
 
   return (
     <>
       <MotionImagesWithScroll
-        id='majidTemplate'
-        folder='majidTemplate'
+        id="majidTemplate"
+        folder="majidTemplate"
         length={51}
         distance={50}
-        fileFormat='.jpg'
+        fileFormat=".jpg"
         fullScreen={true}
         scrollY={scrollY}
         windowSize={windowSize}
       />
+
       <MotionImagesWithScroll
-        id='mickyTemplate'
-        folder='mickyTemplate'
+        id="mickyTemplate"
+        folder="mickyTemplate"
         length={128}
         distance={25}
-        fileFormat='.jpg'
+        fileFormat=".jpg"
         widthSize={{ after768: '350px', befor768: '300px' }}
         scrollY={scrollY}
         windowSize={windowSize}
       />
+      
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 export interface MotionImagesWithScrollProps {
   id: string;
@@ -10,114 +10,82 @@ export interface MotionImagesWithScrollProps {
   fullScreen?: boolean;
   widthSize?: {
     befor768: string;
-    after768: string
+    after768: string;
   };
   scrollY: number;
   windowSize: {
     width: number;
-    height: number
+    height: number;
   };
 }
 
-export const loadImage = (image: { url: string }): Promise<string> => {
+export const loadImage = (url: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const loadImg = new Image();
-    loadImg.src = image.url;
-    loadImg.onload = () => setTimeout(() => resolve(image.url), 2000);
-    loadImg.onerror = (err) => reject(err);
+    const img = new Image();
+    img.src = url;
+    img.onload = () => setTimeout(() => resolve(url), 2000);
+    img.onerror = (err) => reject(err);
   });
 };
 
-const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = (props) => {
-
-  const [imgsLoaded, setImgsLoaded] = useState<boolean>(false);
-  const [imageIndex, setImageIndex] = useState<number>(0);
+const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = ({
+  id,
+  folder,
+  length,
+  distance,
+  fileFormat,
+  fullScreen,
+  widthSize,
+  scrollY,
+  windowSize,
+}) => {
+  const [imgsLoaded, setImgsLoaded] = useState(false);
+  const [imageIndex, setImageIndex] = useState(0);
   const [itemPosition, setItemPosition] = useState<'relative' | 'fixed'>('relative');
   const [containerJustifyContent, setContainerJustifyContent] = useState<'flex-start' | 'flex-end'>('flex-start');
 
-  const height = ((props.length * props.distance) - props.distance);
+  const height = useMemo(() => (length * distance) - distance, [length, distance]);
+  const idSelector = `imageItem${id}`;
 
-  const setId = (): string => {
-    return `imageItem${props.id}`;
-  };
+  const startItem = (): number => document.getElementById(idSelector)?.offsetTop ?? 0;
+  const endItem = (): number => startItem() + height;
 
-  const startItem = (): number => {
-    return document.getElementById(setId())?.offsetTop ?? 0;
-  };
+  const lastImageIndex = useMemo(() => Math.floor(length - 1), [length]);
 
-  const endItem = (): number => {
-    return startItem() + height;
-  };
-
-  const itemScrollHeight = (): number => {
-    return height + props.windowSize.height;
-  };
-
-  const lastImage = (): number => {
-    return Math.floor(props.length - 1);
-  };
-
-  const setImage = (): number => {
-    const r = Math.floor((props.scrollY - startItem()) / props.distance);
-    return r < 0 ? 0 : r;
-  };
-
-  const images = () => {
-    const menuItems = [];
-
-    for (let i = 0; i < props.length; i++) {
-      menuItems.push(
-        <img
-          key={i}
-          style={{
-            display: imageIndex !== i ? 'none' : 'inline-block',
-            width: props.fullScreen
-              ? '100vw'
-              : (props.windowSize.width > 768
-                ? (props.widthSize?.after768 ?? '100vw')
-                : (props.widthSize?.befor768 ?? '80vw')),
-            height: props.fullScreen ? '100vh' : 'auto',
-            objectFit: 'cover',
-          }}
-          src={process.env.PUBLIC_URL + `/${props.folder}/${i}${props.fileFormat}`}
-          alt={`Frame ${i}`}
-        />
-      );
-    }
-
-    return <div>{menuItems}</div>;
+  const currentImageIndex = (): number => {
+    const index = Math.floor((scrollY - startItem()) / distance);
+    return index < 0 ? 0 : index;
   };
 
   useEffect(() => {
     if (!imgsLoaded) {
-      const IMAGES = [];
-      for (let i = 0; i < props.length; i++) {
-        IMAGES.push({ url: process.env.PUBLIC_URL + `/${props.folder}/${i}${props.fileFormat}` });
-      }
-      Promise.all(IMAGES.map((image) => loadImage(image)))
+      const imagePromises = Array.from({ length }, (_, i) =>
+        loadImage(`${process.env.PUBLIC_URL}/${folder}/${i}${fileFormat}`)
+      );
+      Promise.all(imagePromises)
         .then(() => setImgsLoaded(true))
         .catch((err) => console.error('Failed to load images', err));
     }
-  }, [imgsLoaded]);
+  }, [imgsLoaded, folder, length, fileFormat]);
 
   useEffect(() => {
     const start = startItem();
     const end = endItem();
 
-    if (props.scrollY < start) {
+    if (scrollY < start) {
       setImageIndex(0);
       setItemPosition('relative');
       setContainerJustifyContent('flex-start');
-    } else if (props.scrollY > end) {
-      setImageIndex(lastImage());
+    } else if (scrollY > end) {
+      setImageIndex(lastImageIndex);
       setItemPosition('relative');
       setContainerJustifyContent('flex-end');
     } else {
-      setImageIndex(setImage());
+      setImageIndex(currentImageIndex());
       setItemPosition('fixed');
       setContainerJustifyContent('flex-start');
     }
-  }, [props.scrollY, props.windowSize, height, imgsLoaded]);
+  }, [scrollY, windowSize.height, height, imgsLoaded, lastImageIndex]);
 
   return (
     <div
@@ -126,10 +94,10 @@ const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = (props) =>
         display: 'flex',
         flexDirection: 'column',
         justifyContent: containerJustifyContent,
-        height: itemScrollHeight(),
-        minHeight: itemScrollHeight(),
+        height: height + windowSize.height,
+        minHeight: height + windowSize.height,
       }}
-      id={setId()}
+      id={idSelector}
     >
       <div
         className='MotionImagesWithScrollHeader'
@@ -140,23 +108,36 @@ const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = (props) =>
           marginTop: '50px',
         }}
       >
-          {!imgsLoaded ? (<h2>Loading...</h2>) : null}
+        {!imgsLoaded && <h2>Loading...</h2>}
       </div>
       <div
         className='MotionImagesWithScrollItem'
         style={{
+          position: itemPosition,
           top: 0,
           width: '100vw',
           height: '100vh',
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-around',
           alignItems: 'center',
-          position: itemPosition,
-          zIndex: 1,
+          justifyContent: 'center',
         }}
       >
-        {imgsLoaded ? images() : null}
+        {imgsLoaded && (
+          <img
+            key={imageIndex}
+            style={{
+              width: fullScreen
+                ? '100vw'
+                : (windowSize.width > 768
+                    ? (widthSize?.after768 ?? '100vw')
+                    : (widthSize?.befor768 ?? '80vw')),
+              height: fullScreen ? '100vh' : 'auto',
+              objectFit: 'cover',
+            }}
+            src={`${process.env.PUBLIC_URL}/${folder}/${imageIndex}${fileFormat}`}
+            alt={`Frame ${imageIndex}`}
+          />
+        )}
       </div>
     </div>
   );
