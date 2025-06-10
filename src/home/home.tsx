@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import MotionImagesWithScroll from '../motionImagesWithScroll/MotionImagesWithScroll';
+import ScrollMotionImageSequence from '../motionImagesWithScroll/MotionImagesWithScroll';
 import './home.css';
 import throttle from 'lodash.throttle';
 
@@ -47,7 +47,7 @@ const Home: React.FC = () => {
 
   return (
     <>
-      <MotionImagesWithScroll
+      <ScrollMotionImageSequence
         id="majidTemplate"
         folder="majidTemplate"
         length={51}
@@ -58,7 +58,7 @@ const Home: React.FC = () => {
         windowSize={windowSize}
       />
 
-      <MotionImagesWithScroll
+      <ScrollMotionImageSequence
         id="mickyTemplate"
         folder="mickyTemplate"
         length={128}
@@ -68,7 +68,7 @@ const Home: React.FC = () => {
         scrollY={scrollY}
         windowSize={windowSize}
       />
-      
+
     </>
   );
 };

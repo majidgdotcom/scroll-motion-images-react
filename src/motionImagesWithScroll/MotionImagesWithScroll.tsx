@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 
-export interface MotionImagesWithScrollProps {
+export interface ScrollMotionImageSequenceProps {
   id: string;
   folder: string;
   length: number;
@@ -19,16 +19,17 @@ export interface MotionImagesWithScrollProps {
   };
 }
 
-export const loadImage = (url: string): Promise<string> => {
+// Preload an image with artificial delay (simulating loading time)
+export const preloadImageWithDelay = (url: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.src = url;
-    img.onload = () => setTimeout(() => resolve(url), 2000);
+    img.onload = () => setTimeout(() => resolve(url), 2000); // Adjust delay as needed
     img.onerror = (err) => reject(err);
   });
 };
 
-const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = ({
+const ScrollMotionImageSequence: React.FC<ScrollMotionImageSequenceProps> = ({
   id,
   folder,
   length,
@@ -39,81 +40,86 @@ const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = ({
   scrollY,
   windowSize,
 }) => {
-  const [imgsLoaded, setImgsLoaded] = useState(false);
-  const [imageIndex, setImageIndex] = useState(0);
-  const [itemPosition, setItemPosition] = useState<'relative' | 'fixed'>('relative');
-  const [containerJustifyContent, setContainerJustifyContent] = useState<'flex-start' | 'flex-end'>('flex-start');
+  const [allImagesLoaded, setAllImagesLoaded] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [imagePositionStyle, setImagePositionStyle] = useState<'relative' | 'fixed'>('relative');
+  const [containerAlignment, setContainerAlignment] = useState<'flex-start' | 'flex-end'>('flex-start');
 
-  const height = useMemo(() => (length * distance) - distance, [length, distance]);
-  const idSelector = `imageItem${id}`;
+  const scrollTrackHeight = useMemo(() => length * distance - distance, [length, distance]);
+  const containerElementId = `imageItem${id}`;
 
-  const startItem = (): number => document.getElementById(idSelector)?.offsetTop ?? 0;
-  const endItem = (): number => startItem() + height;
+  const getElementTopOffset = (): number =>
+    document.getElementById(containerElementId)?.offsetTop ?? 0;
+
+  const getElementBottomOffset = (): number => getElementTopOffset() + scrollTrackHeight;
 
   const lastImageIndex = useMemo(() => Math.floor(length - 1), [length]);
 
-  const currentImageIndex = (): number => {
-    const index = Math.floor((scrollY - startItem()) / distance);
-    return index < 0 ? 0 : index;
+  const calculateImageIndex = (): number => {
+    const index = Math.floor((scrollY - getElementTopOffset()) / distance);
+    return Math.max(0, index);
   };
 
+  // Preload all images once
   useEffect(() => {
-    if (!imgsLoaded) {
+    if (!allImagesLoaded) {
       const imagePromises = Array.from({ length }, (_, i) =>
-        loadImage(`${process.env.PUBLIC_URL}/${folder}/${i}${fileFormat}`)
+        preloadImageWithDelay(`${process.env.PUBLIC_URL}/${folder}/${i}${fileFormat}`)
       );
       Promise.all(imagePromises)
-        .then(() => setImgsLoaded(true))
+        .then(() => setAllImagesLoaded(true))
         .catch((err) => console.error('Failed to load images', err));
     }
-  }, [imgsLoaded, folder, length, fileFormat]);
+  }, [allImagesLoaded, folder, length, fileFormat]);
 
+  // Determine current image and layout position based on scroll
   useEffect(() => {
-    const start = startItem();
-    const end = endItem();
+    const start = getElementTopOffset();
+    const end = getElementBottomOffset();
 
     if (scrollY < start) {
-      setImageIndex(0);
-      setItemPosition('relative');
-      setContainerJustifyContent('flex-start');
+      setActiveImageIndex(0);
+      setImagePositionStyle('relative');
+      setContainerAlignment('flex-start');
     } else if (scrollY > end) {
-      setImageIndex(lastImageIndex);
-      setItemPosition('relative');
-      setContainerJustifyContent('flex-end');
+      setActiveImageIndex(lastImageIndex);
+      setImagePositionStyle('relative');
+      setContainerAlignment('flex-end');
     } else {
-      setImageIndex(currentImageIndex());
-      setItemPosition('fixed');
-      setContainerJustifyContent('flex-start');
+      setActiveImageIndex(calculateImageIndex());
+      setImagePositionStyle('fixed');
+      setContainerAlignment('flex-start');
     }
-  }, [scrollY, windowSize.height, height, imgsLoaded, lastImageIndex]);
+  }, [scrollY, windowSize.height, scrollTrackHeight, allImagesLoaded, lastImageIndex]);
 
   return (
     <div
-      className='MotionImagesWithScrollContainer'
+      className="ScrollMotionImageSequenceContainer"
       style={{
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: containerJustifyContent,
-        height: height + windowSize.height,
-        minHeight: height + windowSize.height,
+        justifyContent: containerAlignment,
+        height: scrollTrackHeight + windowSize.height,
+        minHeight: scrollTrackHeight + windowSize.height,
       }}
-      id={idSelector}
+      id={containerElementId}
     >
       <div
-        className='MotionImagesWithScrollHeader'
+        className="ScrollMotionImageSequenceHeader"
         style={{
-          position: containerJustifyContent === 'flex-end' ? 'relative' : 'absolute',
+          position: containerAlignment === 'flex-end' ? 'relative' : 'absolute',
           zIndex: 2,
           marginLeft: '50px',
           marginTop: '50px',
         }}
       >
-        {!imgsLoaded && <h2>Loading...</h2>}
+        {!allImagesLoaded && <h2>Loading...</h2>}
       </div>
+
       <div
-        className='MotionImagesWithScrollItem'
+        className="ScrollMotionImageSequenceItem"
         style={{
-          position: itemPosition,
+          position: imagePositionStyle,
           top: 0,
           width: '100vw',
           height: '100vh',
@@ -122,20 +128,20 @@ const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = ({
           justifyContent: 'center',
         }}
       >
-        {imgsLoaded && (
+        {allImagesLoaded && (
           <img
-            key={imageIndex}
+            key={activeImageIndex}
+            src={`${process.env.PUBLIC_URL}/${folder}/${activeImageIndex}${fileFormat}`}
+            alt={`Frame ${activeImageIndex}`}
             style={{
               width: fullScreen
                 ? '100vw'
-                : (windowSize.width > 768
-                    ? (widthSize?.after768 ?? '100vw')
-                    : (widthSize?.befor768 ?? '80vw')),
+                : windowSize.width > 768
+                ? widthSize?.after768 ?? '100vw'
+                : widthSize?.befor768 ?? '80vw',
               height: fullScreen ? '100vh' : 'auto',
               objectFit: 'cover',
             }}
-            src={`${process.env.PUBLIC_URL}/${folder}/${imageIndex}${fileFormat}`}
-            alt={`Frame ${imageIndex}`}
           />
         )}
       </div>
@@ -143,4 +149,4 @@ const MotionImagesWithScroll: React.FC<MotionImagesWithScrollProps> = ({
   );
 };
 
-export default MotionImagesWithScroll;
+export default ScrollMotionImageSequence;
