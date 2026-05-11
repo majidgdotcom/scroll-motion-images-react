@@ -1,78 +1,94 @@
-# Motion images with scroll - Project
+# Scroll Motion Images — React
 
-This project implements a MotionImagesWithScroll component that dynamically displays images while scrolling through the page. It supports various customizations such as image size, distance between images, fullscreen options, and responsiveness. The project also includes a Home component that renders multiple MotionImagesWithScroll instances with different configurations.
+A reusable React component that creates scroll-driven image sequence animations — similar to the effect used on Apple product pages where scrolling through the page animates a frame-by-frame image sequence.
 
-## Releases
+## Live Demo
 
-You can view the live demo of the project at the following link:
-
-[Live Demo](https://majidgdotcom.github.io/scroll-motion-images-react/)
+[https://majidgdotcom.github.io/scroll-motion-images-react/](https://majidgdotcom.github.io/scroll-motion-images-react/)
 
 ## Features
 
-- **Dynamic Image Loading:** Images are loaded and displayed as the user scrolls.
-- **Responsive Layout:** The layout is responsive, adjusting based on the window size.
-- **ustomization:** Props allow for controlling image folder, number of images, scroll distance, and image size.
-- **Full-Screen Support:** Option to display images in full-screen mode.
-
-## Project Structure
-
-- **Home.tsx:** Renders the MotionImagesWithScroll components with different configurations.
-- **MotionImagesWithScroll.tsx:** The main component responsible for rendering images based on the user’s scroll position.
-- **IMotionImagesWithScroll.ts:** Interface definition for the props passed to MotionImagesWithScroll.
-- **home.css:** Custom styles for the components, including background colors, scrollbars, and responsive design.
+- **Scroll-driven animation** — displays the correct frame based on the user's scroll position
+- **Preloads all images** before starting, so playback is smooth with no mid-scroll loading gaps
+- **Responsive** — configurable image width for mobile and desktop breakpoints
+- **Full-screen support** — option to fill the entire viewport
+- **Throttled listeners** — scroll and resize handlers are throttled for performance
 
 ## Installation
 
-1.	Clone the repository:
+```bash
+git clone https://github.com/majidgdotcom/scroll-motion-images-react.git
+cd scroll-motion-images-react
+npm install
+npm start
+```
 
-2.	Navigate to the project directory:
-
-	```
-	cd scroll-motion-images-react
-
-3.	Install the dependencies:
-
-	```
-	npm install
-
-4.	Start the development server:
-
-	```
-	npm start
-
-5.	Open http://localhost:3000 to view it in the browser.
-
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ## Usage
 
-1.	**Folder Structure for Images:** Place your images in the public folder, organized in subfolders. For example:
+### 1. Prepare your images
 
-        public/
-        ├── majidTemplate/
-        │   ├── 0.jpg
-        │   ├── 1.jpg
-        │   └── ...
-        └── mickyTemplate/
-            ├── 0.jpg
-            ├── 1.jpg
-            └── ...
+Place sequentially numbered images in a subfolder under `public/`:
 
-2.	**Home Component:** The Home component demonstrates how to use the MotionImagesWithScroll component. It renders two sets of images with different configurations:
+```
+public/
+└── myAnimation/
+    ├── 0.jpg
+    ├── 1.jpg
+    ├── 2.jpg
+    └── ...
+```
 
-3.	**MotionImagesWithScroll Component:** This component displays images based on scroll position and provides customization options like fullscreen, width size, and distance between images.
+### 2. Use the component
 
-## Props for MotionImagesWithScroll
+Pass `scrollY` and `windowSize` from the parent — see `home.tsx` for a full example using the `useScrollY` and `useWindowSize` custom hooks.
 
-| **Prop Name**  | **Type**               | **Description**                                                    |
-|----------------|------------------------|--------------------------------------------------------------------|
-| `id`           | `string`               | Unique identifier for the image set.                               |
-| `folder`       | `string`               | Folder name where images are stored.                               |
-| `length`       | `number`               | Total number of images in the folder.                              |
-| `distance`     | `number`               | Distance between images in pixels.                                 |
-| `fileFormat`   | `string`               | File format for the images (e.g., `.jpg`, `.png`).                 |
-| `backColor`    | `string` (optional)    | Background color for the component.                                |
-| `fullScreen`   | `boolean` (optional)   | Whether to display images in fullscreen mode.                      |
-| `widthSize`    | `object` (optional)    | Object specifying image width before and after 768px.              |
-| `scrollY`      | `number`               | Current scroll position, passed from the parent.                   |
-| `windowSize`   | `object`               | Current window size (width and height), passed from the parent.    |
+```tsx
+<ScrollMotionImageSequence
+  id="myAnimation"
+  folder="myAnimation"
+  length={60}
+  distance={50}
+  fileFormat=".jpg"
+  fullScreen={true}
+  scrollY={scrollY}
+  windowSize={windowSize}
+/>
+```
+
+## Props
+
+| Prop | Type | Required | Description |
+|---|---|---|---|
+| `id` | `string` | ✅ | Unique identifier for this instance |
+| `folder` | `string` | ✅ | Subfolder name under `public/` where images are stored |
+| `length` | `number` | ✅ | Total number of frames |
+| `distance` | `number` | ✅ | Pixels to scroll per frame change |
+| `fileFormat` | `string` | ✅ | File extension, e.g. `'.jpg'` or `'.png'` |
+| `scrollY` | `number` | ✅ | Current scroll position (from parent) |
+| `windowSize` | `{ width: number, height: number }` | ✅ | Current window dimensions (from parent) |
+| `fullScreen` | `boolean` | — | Fill the full viewport |
+| `widthSize` | `{ before768: string, after768: string }` | — | Image width at mobile / desktop breakpoints |
+| `backColor` | `string` | — | Background color of the container |
+
+## Scripts
+
+```bash
+npm start       # dev server
+npm test        # run tests
+npm run build   # production build
+npm run deploy  # deploy to GitHub Pages
+```
+
+## Project Structure
+
+```
+src/
+├── motionImagesWithScroll/
+│   ├── MotionImagesWithScroll.tsx   # main component
+│   └── MotionImagesWithScroll.test.tsx
+└── home/
+    ├── home.tsx                     # example usage with custom hooks
+    └── home.css
+```

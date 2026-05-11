@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import ScrollMotionImageSequence from '../motionImagesWithScroll/MotionImagesWithScroll';
 import './home.css';
 import throttle from 'lodash.throttle';
 
-// Custom hook for window size
 const useWindowSize = () => {
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -25,7 +24,6 @@ const useWindowSize = () => {
   return windowSize;
 };
 
-// Custom hook for scroll position
 const useScrollY = () => {
   const [scrollY, setScrollY] = useState(window.scrollY);
 
@@ -41,7 +39,7 @@ const useScrollY = () => {
   return scrollY;
 };
 
-const Home: React.FC = () => {
+const Home: FC = () => {
   const scrollY = useScrollY();
   const windowSize = useWindowSize();
 
@@ -68,7 +66,6 @@ const Home: React.FC = () => {
         scrollY={scrollY}
         windowSize={windowSize}
       />
-
     </>
   );
 };

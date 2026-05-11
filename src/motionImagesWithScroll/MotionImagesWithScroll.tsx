@@ -1,18 +1,18 @@
-import { useEffect, useState, useMemo } from 'react';
+import { FC, useEffect, useState, useMemo } from 'react';
 
 export interface ScrollMotionImageSequenceProps {
   id: string;
   folder: string;
-  length: number; // total number of frames/images
-  distance: number; // pixels to scroll per frame change
-  fileFormat: string; // e.g. '.jpg', '.png'
+  length: number;       // total number of frames/images
+  distance: number;     // pixels to scroll per frame change
+  fileFormat: string;   // e.g. '.jpg', '.png'
 
   backColor?: string;
   fullScreen?: boolean;
 
   widthSize?: {
-    before768: string;  // screen width below 768px
-    after768: string;   // screen width above 768px
+    before768: string;  // image width on screens narrower than 768px
+    after768: string;   // image width on screens wider than 768px
   };
 
   scrollY: number;
@@ -22,17 +22,16 @@ export interface ScrollMotionImageSequenceProps {
   };
 }
 
-// Preload an image with artificial delay (simulating loading time)
-export const preloadImageWithDelay = (url: string): Promise<string> => {
-  return new Promise((resolve, reject) => {
+// Preload a single image URL, resolving when the browser has loaded it.
+const preloadImage = (url: string): Promise<string> =>
+  new Promise((resolve, reject) => {
     const img = new Image();
     img.src = url;
-    img.onload = () => setTimeout(() => resolve(url), 2000); // Adjust delay as needed
+    img.onload = () => resolve(url);
     img.onerror = (err) => reject(err);
   });
-};
 
-const ScrollMotionImageSequence: React.FC<ScrollMotionImageSequenceProps> = ({
+const ScrollMotionImageSequence: FC<ScrollMotionImageSequenceProps> = ({
   id,
   folder,
   length,
@@ -49,33 +48,32 @@ const ScrollMotionImageSequence: React.FC<ScrollMotionImageSequenceProps> = ({
   const [containerAlignment, setContainerAlignment] = useState<'flex-start' | 'flex-end'>('flex-start');
 
   const scrollTrackHeight = useMemo(() => length * distance - distance, [length, distance]);
+  const lastImageIndex = useMemo(() => length - 1, [length]);
   const containerElementId = `imageItem${id}`;
 
   const getElementTopOffset = (): number =>
     document.getElementById(containerElementId)?.offsetTop ?? 0;
 
-  const getElementBottomOffset = (): number => getElementTopOffset() + scrollTrackHeight;
-
-  const lastImageIndex = useMemo(() => Math.floor(length - 1), [length]);
+  const getElementBottomOffset = (): number =>
+    getElementTopOffset() + scrollTrackHeight;
 
   const calculateImageIndex = (): number => {
     const index = Math.floor((scrollY - getElementTopOffset()) / distance);
     return Math.max(0, index);
   };
 
-  // Preload all images once
+  // Preload all images once on mount
   useEffect(() => {
-    if (!allImagesLoaded) {
-      const imagePromises = Array.from({ length }, (_, i) =>
-        preloadImageWithDelay(`${process.env.PUBLIC_URL}/${folder}/${i}${fileFormat}`)
-      );
-      Promise.all(imagePromises)
-        .then(() => setAllImagesLoaded(true))
-        .catch((err) => console.error('Failed to load images', err));
-    }
-  }, [allImagesLoaded, folder, length, fileFormat]);
+    const imageUrls = Array.from({ length }, (_, i) =>
+      `${process.env.PUBLIC_URL}/${folder}/${i}${fileFormat}`
+    );
 
-  // Determine current image and layout position based on scroll
+    Promise.all(imageUrls.map(preloadImage))
+      .then(() => setAllImagesLoaded(true))
+      .catch((err) => console.error('Failed to preload images:', err));
+  }, [folder, length, fileFormat]);
+
+  // Update active image and layout position based on scroll
   useEffect(() => {
     const start = getElementTopOffset();
     const end = getElementBottomOffset();
@@ -93,6 +91,7 @@ const ScrollMotionImageSequence: React.FC<ScrollMotionImageSequenceProps> = ({
       setImagePositionStyle('fixed');
       setContainerAlignment('flex-start');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scrollY, windowSize.height, scrollTrackHeight, allImagesLoaded, lastImageIndex]);
 
   return (
